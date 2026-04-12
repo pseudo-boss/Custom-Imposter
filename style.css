@@ -1,0 +1,499 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface-2: #1e1e1e;
+  --border: #2a2a2a;
+  --border-hover: #444;
+  --text: #f0f0f0;
+  --subtle: #e8e8e8;
+  --muted: #a5a5a5;
+  --accent: #e8ff5a;
+  --accent-dark: #b8cc30;
+  --accent-text: #0a0a0a;
+  --danger: #ff5a5a;
+  --danger-subtle: rgba(255, 90, 90, 0.1);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Screens ── */
+.screen {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 56px 28px 44px;
+  overflow-y: auto;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* ── Entrance animation ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.screen.active > * {
+  animation: fadeUp 0.32s ease both;
+}
+.screen.active > *:nth-child(1) { animation-delay: 0.00s; }
+.screen.active > *:nth-child(2) { animation-delay: 0.06s; }
+.screen.active > *:nth-child(3) { animation-delay: 0.11s; }
+.screen.active > *:nth-child(4) { animation-delay: 0.16s; }
+.screen.active > *:nth-child(5) { animation-delay: 0.20s; }
+.screen.active > *:nth-child(6) { animation-delay: 0.23s; }
+
+/* ── Typography ── */
+h1 {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.subtitle {
+  color: var(--subtle);
+  font-size: 1.2rem;
+  line-height: 1.55;
+}
+
+.spacer { flex: 1; }
+
+/* ── Tag / pill ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 5px 13px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--subtle);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.pill.accent {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: transparent;
+}
+
+/* ─────────────────────────────
+   SCREEN 1 — Player Count
+───────────────────────────── */
+#screen-count {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 40px;
+}
+
+#screen-count h1 span { color: var(--accent); }
+
+.count-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.stepper {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+
+.stepper:active {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+#player-count-display {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 800;
+  letter-spacing: -4px;
+  color: var(--accent);
+  min-width: 80px;
+  text-align: center;
+}
+
+/* ─────────────────────────────
+   SCREEN 2 — Names
+───────────────────────────── */
+#screen-names {
+  gap: 20px;
+}
+
+#name-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.name-input {
+  width: 100%;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.18s, background 0.18s;
+  -webkit-appearance: none;
+}
+
+.name-input::placeholder { color: var(--muted); }
+.name-input:focus {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+/* ─────────────────────────────
+   SCREEN 3 — Word Entry
+───────────────────────────── */
+#screen-words {
+  gap: 16px;
+}
+
+#word-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.word-group {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.18s;
+}
+
+.word-group:focus-within {
+  border-color: var(--border-hover);
+}
+
+.word-group .field-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding-left: 2px;
+}
+
+.word-group input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.18s;
+  -webkit-appearance: none;
+}
+
+.word-group input::placeholder { color: var(--muted); }
+.word-group input:focus { border-color: var(--accent); }
+
+.word-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+/* ─────────────────────────────
+   SCREEN 4 — Pass Phone
+───────────────────────────── */
+#screen-pass {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.pass-icon-wrap {
+  width: 80px;
+  height: 80px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+#pass-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* ─────────────────────────────
+   SCREEN 5 — Role Reveal
+───────────────────────────── */
+#screen-role {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.role-result {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.role-card {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.role-card.imposter {
+  background: var(--danger-subtle);
+  border-color: var(--danger);
+}
+
+.role-card .role-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--subtle);
+}
+
+.role-card.imposter .role-tag { color: var(--danger); }
+
+.role-card .role-main {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.05;
+  color: var(--text);
+}
+
+.role-card.imposter .role-main { color: var(--danger); }
+
+.role-card .role-clue {
+  font-size: 1rem;
+  color: var(--subtle);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 8px 18px;
+  border-radius: 100px;
+  margin-top: 6px;
+}
+
+/* ─────────────────────────────
+   SCREEN 6 — Round Reveal
+───────────────────────────── */
+#screen-round-reveal {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.reveal-result {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reveal-block {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reveal-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--subtle);
+}
+
+.reveal-value {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--accent);
+}
+
+/* ─────────────────────────────
+   Buttons
+───────────────────────────── */
+.btn-primary {
+  width: 100%;
+  padding: 18px;
+  background: var(--accent);
+  color: var(--accent-text);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary:active {
+  opacity: 0.82;
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-secondary:active {
+  border-color: var(--border-hover);
+  background: var(--surface-2);
+}
+
+.btn-reveal {
+  width: 100%;
+  padding: 26px;
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px dashed var(--border-hover);
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-reveal:active {
+  border-color: var(--accent);
+  background: rgba(232, 255, 90, 0.04);
+}
+
+/* ─────────────────────────────
+   Error
+───────────────────────────── */
+.error-msg {
+  width: 100%;
+  color: var(--danger);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 12px 16px;
+  background: var(--danger-subtle);
+  border: 1px solid rgba(255, 90, 90, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+/* ─────────────────────────────
+   Utility
+───────────────────────────── */
+.hidden { display: none !important; }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
