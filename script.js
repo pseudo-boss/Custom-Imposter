@@ -17,6 +17,41 @@ let state = {
 // ─────────────────────────────────────────────
 //  PERSISTENCE
 // ─────────────────────────────────────────────
+const graceMessages = [
+  'GENUINELY why tf do you look like that',
+  'Scientists all over the world are STILL looking for that number',
+  'Actually fat as hell',
+  'why cant you look more like yo mum fr',
+  'you were adopted from the whale section at seaworld',
+  'even though you may be fat, ugly, dumb as hell, useless, never carries her luggage, always two steps behind intellectually, and the least valuable member of society.',
+  'you peaked (aura wise, definitely NOT weight wise) at dj_katzV3',
+  'you look like sabrina carpenter if she got horribly disfigured in a brutal car accident, and then proceeded to eat 6 newsxpresses (the entire store)',
+  'kill yoursuzza mate',
+  'ok lowk tho jane lookin kinda sus rn',
+  'daaammmnnn she bad - no i think she looks quite good actually',
+  'dolce gabana mega extra large family meal lookin ass'
+];
+const dylanMessages = [
+  'Does anyone need some milk? 💛',
+  'Bu Yong 😊',
+  'that lasanga oil poured on noodles actually slapped tho fr',
+  'you have a tell',
+  'bad feeling about grace this round',
+  'dont forget who you really are burp rattle',
+  'when is that trip edit coming out',
+  'she never carries her luggage tho fr'
+];
+
+const janeMessages = [
+  'project hail mary was good',
+  'lowk sus on grace this round',
+  'lowk dylan look sus af ong',
+  'me when i lie about dropping 50c under the table outside southport park newsxpress',
+  'ok but fr why you ordering a kebab delivery on ubereats at 3:43pm on a thursday arvo',
+  'classic project x at graces tonight - dont get too turnt',
+  'ok but if youre not gonna grab the free noodles you shouldnt waste it',
+  'china 2027 FOR SURE this time its HAPPENING'
+];
 
 function saveState() {
   localStorage.setItem('imposter_state', JSON.stringify(state));
@@ -151,6 +186,21 @@ function showWordEntryForCurrentPlayer() {
 
   if (state.currentRound > 0) {
     const skipBtn = document.createElement('button');
+    skipBtn.addEventListener('click', () => {
+  // Clear all word fields so next player starts fresh
+  document.querySelectorAll('#word-fields [data-role="word"]').forEach(i => i.value = '');
+  document.querySelectorAll('#word-fields [data-role="clue"]').forEach(i => i.value = '');
+  clearError('screen-words');
+
+  skipBtn.remove();
+  state.wordEntryIndex++;
+  if (state.wordEntryIndex === 1) {
+    prepareRound(true);
+  }
+  state.roleRevealIndex = state.wordEntryIndex - 1;
+  saveState();
+  showRoleRevealForCurrentPlayer();
+});
     skipBtn.className = 'btn-secondary';
     skipBtn.id = 'btn-skip-word';
     skipBtn.textContent = 'Skip — just show my role';
@@ -243,9 +293,10 @@ document.getElementById('btn-words-submit').addEventListener('click', () => {
   }
 
   // Check against existing pool
-  const clash = newWords.find(w => allExistingWords.includes(w));
+const nonEmptyNewWords = newWords.filter(w => w !== '');
+  const clash = nonEmptyNewWords.find(w => allExistingWords.includes(w));
   if (clash) {
-    showError('screen-words', `"${clash}" has already been added. Try a different word.`);
+    showError('screen-words', `"${clash}" word has already been added. Try a different word.`);
     return;
   }
 
@@ -375,6 +426,34 @@ document.getElementById('btn-reveal-role').addEventListener('click', () => {
   }
 
   contentEl.appendChild(card);
+
+    const currentPlayer = state.players[state.roleRevealIndex];
+  if (currentPlayer.name.toLowerCase() === 'grace123') {
+    const msg = document.createElement('p');
+    msg.className = 'subtitle';
+    msg.style.textAlign = 'center';
+    msg.style.marginTop = '4px';
+    msg.textContent = graceMessages[Math.floor(Math.random() * graceMessages.length)];
+    contentEl.appendChild(msg);
+    
+  }
+  if (currentPlayer.name.toLowerCase() === 'dylan123') {
+  const msg = document.createElement('p');
+  msg.className = 'subtitle';
+  msg.style.textAlign = 'center';
+  msg.style.marginTop = '4px';
+  msg.textContent = dylanMessages[Math.floor(Math.random() * dylanMessages.length)];
+  contentEl.appendChild(msg);
+}
+
+if (currentPlayer.name.toLowerCase() === 'jane123') {
+  const msg = document.createElement('p');
+  msg.className = 'subtitle';
+  msg.style.textAlign = 'center';
+  msg.style.marginTop = '4px';
+  msg.textContent = janeMessages[Math.floor(Math.random() * janeMessages.length)];
+  contentEl.appendChild(msg);
+}
 
   document.getElementById('btn-reveal-role').classList.add('hidden');
   document.getElementById('role-result').classList.remove('hidden');
