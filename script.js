@@ -428,7 +428,7 @@ document.getElementById('btn-reveal-role').addEventListener('click', () => {
   contentEl.appendChild(card);
 
     const currentPlayer = state.players[state.roleRevealIndex];
-  if (currentPlayer.name.toLowerCase() === 'grace123') {
+  if (currentPlayer.name.toLowerCase() === 'grace') {
     const msg = document.createElement('p');
     msg.className = 'subtitle';
     msg.style.textAlign = 'center';
@@ -437,7 +437,7 @@ document.getElementById('btn-reveal-role').addEventListener('click', () => {
     contentEl.appendChild(msg);
     
   }
-  if (currentPlayer.name.toLowerCase() === 'dylan123') {
+  if (currentPlayer.name.toLowerCase() === 'dylan') {
   const msg = document.createElement('p');
   msg.className = 'subtitle';
   msg.style.textAlign = 'center';
@@ -446,7 +446,7 @@ document.getElementById('btn-reveal-role').addEventListener('click', () => {
   contentEl.appendChild(msg);
 }
 
-if (currentPlayer.name.toLowerCase() === 'jane123') {
+if (currentPlayer.name.toLowerCase() === 'jane') {
   const msg = document.createElement('p');
   msg.className = 'subtitle';
   msg.style.textAlign = 'center';
