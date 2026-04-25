@@ -12,6 +12,7 @@ let state = {
   imposterIndex: null,  // index into players[]
   wordEntryIndex: 0,    // which player is currently entering words
   roleRevealIndex: 0,   // which player is currently seeing their role
+  roundPrepared: false, // true once prepareRound() has run for the current round
 };
 
 // ─────────────────────────────────────────────
@@ -151,6 +152,7 @@ document.getElementById('btn-names-next').addEventListener('click', () => {
   state.roleRevealIndex = 0;
   state.roundWord = null;
   state.imposterIndex = null;
+  state.roundPrepared = false;
 
   saveState();
   startWordEntryPhase();
@@ -178,42 +180,36 @@ function showWordEntryForCurrentPlayer() {
       : 'Add a new word and clue';
 
   buildWordFields(wordCount);
-  buildWordFields(wordCount);
 
-  // Show skip button only from round 2 onwards
+  // Remove any leftover skip button from a previous render
   const existingSkip = document.getElementById('btn-skip-word');
   if (existingSkip) existingSkip.remove();
 
+  // Show skip button only from round 2 onwards
   if (state.currentRound > 0) {
     const skipBtn = document.createElement('button');
-    skipBtn.addEventListener('click', () => {
-  // Clear all word fields so next player starts fresh
-  document.querySelectorAll('#word-fields [data-role="word"]').forEach(i => i.value = '');
-  document.querySelectorAll('#word-fields [data-role="clue"]').forEach(i => i.value = '');
-  clearError('screen-words');
-
-  skipBtn.remove();
-  state.wordEntryIndex++;
-  if (state.wordEntryIndex === 1) {
-    prepareRound(true);
-  }
-  state.roleRevealIndex = state.wordEntryIndex - 1;
-  saveState();
-  showRoleRevealForCurrentPlayer();
-});
     skipBtn.className = 'btn-secondary';
     skipBtn.id = 'btn-skip-word';
     skipBtn.textContent = 'Skip — just show my role';
+
     skipBtn.addEventListener('click', () => {
       skipBtn.remove();
+      clearError('screen-words');
+
+      // Advance wordEntryIndex so the next player's word entry is correct,
+      // but set roleRevealIndex to THIS player so they still see their role.
+      state.roleRevealIndex = state.wordEntryIndex;
       state.wordEntryIndex++;
-      if (state.wordEntryIndex === 1) {
+
+      // If the round hasn't been prepared yet, do it now.
+      if (!state.roundPrepared) {
         prepareRound(true);
       }
-      state.roleRevealIndex = state.wordEntryIndex - 1;
+
       saveState();
       showRoleRevealForCurrentPlayer();
     });
+
     document.getElementById('btn-words-submit').insertAdjacentElement('afterend', skipBtn);
   }
 
@@ -276,7 +272,7 @@ document.getElementById('btn-words-submit').addEventListener('click', () => {
     return;
   }
 
-// Check for duplicate words against existing pool
+  // Check for duplicate words against existing pool
   const allExistingWords = [
     ...state.unusedWords,
     ...state.usedWords,
@@ -293,7 +289,7 @@ document.getElementById('btn-words-submit').addEventListener('click', () => {
   }
 
   // Check against existing pool
-const nonEmptyNewWords = newWords.filter(w => w !== '');
+  const nonEmptyNewWords = newWords.filter(w => w !== '');
   const clash = nonEmptyNewWords.find(w => allExistingWords.includes(w));
   if (clash) {
     showError('screen-words', `"${clash}" word has already been added. Try a different word.`);
@@ -327,10 +323,11 @@ const nonEmptyNewWords = newWords.filter(w => w !== '');
       prepareRound();
     }
   } else {
-    // Round 2+: prepare round after first player submits, then show roles inline
-    if (state.wordEntryIndex === 1) {
-      prepareRound(true); // true = don't reset roleRevealIndex yet
+    // Round 2+: prepare round on first submission if not already prepared, then show role
+    if (!state.roundPrepared) {
+      prepareRound(true);
     }
+    // roleRevealIndex = the player who just submitted (wordEntryIndex was incremented above)
     state.roleRevealIndex = state.wordEntryIndex - 1;
     saveState();
     showRoleRevealForCurrentPlayer();
@@ -368,10 +365,22 @@ function prepareRound(keepRevealIndex = false) {
     return;
   }
 
-  const wordIndex = Math.floor(Math.random() * state.unusedWords.length);
-  state.roundWord = state.unusedWords[wordIndex];
-  state.unusedWords.splice(wordIndex, 1);
+  // FIX: Pick the imposter first, then select a word they didn't submit.
+  // This prevents the imposter from recognising their own word via the clue.
   state.imposterIndex = Math.floor(Math.random() * state.players.length);
+  state.roundPrepared = true;
+
+  const safeWords = state.unusedWords.filter(w => w.addedBy !== state.imposterIndex);
+  const poolToUse = safeWords.length > 0 ? safeWords : state.unusedWords; // fallback if all words are theirs
+
+  const wordIndex = Math.floor(Math.random() * poolToUse.length);
+  state.roundWord = poolToUse[wordIndex];
+
+  // Remove the chosen word from unusedWords
+  const unusedIdx = state.unusedWords.findIndex(
+    w => w.word === state.roundWord.word
+  );
+  state.unusedWords.splice(unusedIdx, 1);
 
   if (!keepRevealIndex) {
     state.roleRevealIndex = 0;
@@ -427,7 +436,7 @@ document.getElementById('btn-reveal-role').addEventListener('click', () => {
 
   contentEl.appendChild(card);
 
-    const currentPlayer = state.players[state.roleRevealIndex];
+  const currentPlayer = state.players[state.roleRevealIndex];
   if (currentPlayer.name.toLowerCase() === 'grace') {
     const msg = document.createElement('p');
     msg.className = 'subtitle';
@@ -435,25 +444,23 @@ document.getElementById('btn-reveal-role').addEventListener('click', () => {
     msg.style.marginTop = '4px';
     msg.textContent = graceMessages[Math.floor(Math.random() * graceMessages.length)];
     contentEl.appendChild(msg);
-    
   }
   if (currentPlayer.name.toLowerCase() === 'dylan') {
-  const msg = document.createElement('p');
-  msg.className = 'subtitle';
-  msg.style.textAlign = 'center';
-  msg.style.marginTop = '4px';
-  msg.textContent = dylanMessages[Math.floor(Math.random() * dylanMessages.length)];
-  contentEl.appendChild(msg);
-}
-
-if (currentPlayer.name.toLowerCase() === 'jane') {
-  const msg = document.createElement('p');
-  msg.className = 'subtitle';
-  msg.style.textAlign = 'center';
-  msg.style.marginTop = '4px';
-  msg.textContent = janeMessages[Math.floor(Math.random() * janeMessages.length)];
-  contentEl.appendChild(msg);
-}
+    const msg = document.createElement('p');
+    msg.className = 'subtitle';
+    msg.style.textAlign = 'center';
+    msg.style.marginTop = '4px';
+    msg.textContent = dylanMessages[Math.floor(Math.random() * dylanMessages.length)];
+    contentEl.appendChild(msg);
+  }
+  if (currentPlayer.name.toLowerCase() === 'jane') {
+    const msg = document.createElement('p');
+    msg.className = 'subtitle';
+    msg.style.textAlign = 'center';
+    msg.style.marginTop = '4px';
+    msg.textContent = janeMessages[Math.floor(Math.random() * janeMessages.length)];
+    contentEl.appendChild(msg);
+  }
 
   document.getElementById('btn-reveal-role').classList.add('hidden');
   document.getElementById('role-result').classList.remove('hidden');
@@ -476,7 +483,7 @@ document.getElementById('btn-role-next').addEventListener('click', () => {
       showRoundReveal();
     }
   } else {
-    // Round 2+ — next player does word entry then sees role
+    // Round 2+: next player does word entry then sees role
     if (state.wordEntryIndex < state.players.length) {
       showPassScreen(
         state.players[state.wordEntryIndex].name,
@@ -521,6 +528,7 @@ document.getElementById('btn-play-again').addEventListener('click', () => {
 
   state.currentRound++;
   state.wordEntryIndex = 0;
+  state.roundPrepared = false;
 
   saveState();
 
